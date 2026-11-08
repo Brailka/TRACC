@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ярлыки по долгому нажатию на иконку: подключить и отключить VPN без открытия приложения. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="connect"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_on"
+        android:shortcutShortLabel="@string/shortcut_connect"
+        android:shortcutLongLabel="@string/shortcut_connect">
+        <intent
+            android:action="app.rvc.action.CONNECT"
+            android:targetPackage="com.makdren.rvc"
+            android:targetClass="app.rvc.vpn.ToggleActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="disconnect"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_off"
+        android:shortcutShortLabel="@string/shortcut_disconnect"
+        android:shortcutLongLabel="@string/shortcut_disconnect">
+        <intent
+            android:action="app.rvc.action.DISCONNECT"
+            android:targetPackage="com.makdren.rvc"
+            android:targetClass="app.rvc.vpn.ToggleActivity" />
+    </shortcut>
+</shortcuts>

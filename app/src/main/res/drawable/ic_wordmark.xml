@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Логотип RVC: строчные буквы из штрихов одной толщины со скруглёнными концами. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="54dp" android:height="28dp"
+    android:viewportWidth="54" android:viewportHeight="28">
+    <!-- Штрихи занимают x 1,25…51,04 и y 8…26: сдвиг (+0,86; −3) ставит надпись ровно по центру поля 54×28. -->
+    <group android:translateX="0.86" android:translateY="-3">
+    <path android:pathData="M4,10.75 L4,23.25 M4,17 C4,12.5 7,10.75 11,10.75 M18.5,10.75 L25,23.25 L31.5,10.75 M48.29,12.98 A6.25,6.25 0 1,0 48.29,21.02"
+        android:strokeColor="#FFFFFFFF" android:strokeWidth="5.5"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    </group>
+</vector>
