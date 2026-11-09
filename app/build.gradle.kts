@@ -26,7 +26,7 @@ android {
         val tagVersion = (findProperty("traccVersion") as String?)?.removePrefix("v")
         versionName = tagVersion ?: "1.0.0"
         versionCode = tagVersion?.split('.', '-')?.let { p -> p[0].toInt() * 10000 + p[1].toInt() * 100 + p[2].toInt() } ?: 10000
-        buildConfigField("String", "UPDATE_REPO", "\"${findProperty("traccUpdateRepo") ?: "OWNER/TRACC"}\"")
+        buildConfigField("String", "UPDATE_REPO", "\"${findProperty("traccUpdateRepo") ?: "makdren/TRACC"}\"")
     }
 
     signingConfigs {
