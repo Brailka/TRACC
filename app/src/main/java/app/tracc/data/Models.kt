@@ -10,6 +10,9 @@ import kotlinx.serialization.Serializable
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 @Serializable
+enum class InterfaceMode { MODERN, CLASSIC }
+
+@Serializable
 enum class PerAppMode { OFF, BYPASS, PROXY }
 
 /**
@@ -34,6 +37,7 @@ data class AppSettings(
     val onboardingDone: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val accentColor: Int = 0,
+    val interfaceMode: InterfaceMode = InterfaceMode.MODERN,
     val routingEnabled: Boolean = true,
     val activeRoutingId: String = "builtin-ru",
     val perAppMode: PerAppMode = PerAppMode.OFF,

@@ -43,6 +43,7 @@ sealed interface Screen {
     data class RoutingDetail(val id: String) : Screen
     data object Apps : Screen
     data object Settings : Screen
+    data object Interface : Screen
     data object Messages : Screen
     data object About : Screen
 }

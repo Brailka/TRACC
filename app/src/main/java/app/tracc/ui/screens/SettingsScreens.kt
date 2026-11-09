@@ -65,6 +65,7 @@ import app.tracc.data.Hwid
 import app.tracc.data.PingType
 import app.tracc.data.SortOrder
 import app.tracc.data.ThemeMode
+import app.tracc.data.InterfaceMode
 import app.tracc.engine.AwgEngine
 import app.tracc.engine.XrayEngine
 import app.tracc.net.RustNet
@@ -107,7 +108,6 @@ fun SettingsScreen(vm: MainViewModel) {
     var portDialog by remember { mutableStateOf(false) }
     var pingDialog by remember { mutableStateOf(false) }
     var sortDialog by remember { mutableStateOf(false) }
-    var themeDialog by remember { mutableStateOf(false) }
     val proxy = s.connectionMode == ConnectionMode.PROXY
 
     ScreenScaffold("Настройки", onBack = { vm.back() }) {
@@ -223,15 +223,7 @@ fun SettingsScreen(vm: MainViewModel) {
         item { SectionTitle("Оформление и устройство") }
         item {
             GroupCard {
-                ListRow("Тема", value = themeTitle(s.themeMode), icon = Icons.Rounded.DarkMode, chevron = true, onClick = { themeDialog = true })
-                var accentDialog by remember { mutableStateOf(false) }
-                ListRow("Акцентный цвет", value = app.tracc.core.AccentPalette.names[app.tracc.core.AccentPalette.index(s.accentColor)], icon = Icons.Rounded.Palette, chevron = true, onClick = { accentDialog = true })
-                if (accentDialog) ChoiceDialog(
-                    "Акцентный цвет",
-                    app.tracc.core.AccentPalette.names.mapIndexed { i, name -> Choice(i, name) },
-                    selected = s.accentColor,
-                    onDismiss = { accentDialog = false },
-                ) { color -> vm.updateSettings { it.copy(accentColor = color) }; accentDialog = false }
+                ListRow("Интерфейс", "Вид главного экрана, тема и цвета", Icons.Rounded.Palette, chevron = true, onClick = { vm.navigate(Screen.Interface) })
                 Divider()
                 val hwid = remember { Hwid.get(context) }
                 ListRow("HWID · ${hwid.take(8)}…", "Идентификатор устройства для лимита устройств провайдера. Нажмите, чтобы скопировать", Icons.Rounded.Fingerprint, onClick = {
@@ -294,17 +286,6 @@ fun SettingsScreen(vm: MainViewModel) {
         }
     }
 
-    if (themeDialog) {
-        ChoiceDialog(
-            "Тема",
-            ThemeMode.entries.map { Choice(it, themeTitle(it)) },
-            selected = s.themeMode,
-            onDismiss = { themeDialog = false },
-        ) { mode ->
-            vm.updateSettings { it.copy(themeMode = mode) }
-            themeDialog = false
-        }
-    }
 
     if (portDialog) {
         var text by remember { mutableStateOf(s.proxyPort.toString()) }
@@ -470,6 +451,35 @@ fun AddDialog(vm: MainViewModel) {
         },
     ) {
         TraccTextField(text, { text = it }, placeholder = "https://…", singleLine = false)
+    }
+}
+
+@Composable
+fun InterfaceScreen(vm: MainViewModel) {
+    val s by vm.store.settings.collectAsStateWithLifecycle()
+    var themeDialog by remember { mutableStateOf(false) }
+    var accentDialog by remember { mutableStateOf(false) }
+    ScreenScaffold("Интерфейс", onBack = { vm.back() }) {
+        item { SectionTitle("Главный экран") }
+        item {
+            GroupCard {
+                ListRow("Вид интерфейса", if (s.interfaceMode == InterfaceMode.CLASSIC) "Старый интерфейс" else "Современный интерфейс", Icons.Rounded.PhoneAndroid, chevron = true, onClick = {
+                    vm.updateSettings { it.copy(interfaceMode = if (it.interfaceMode == InterfaceMode.CLASSIC) InterfaceMode.MODERN else InterfaceMode.CLASSIC) }
+                })
+                Divider()
+                ListRow("Тема", value = themeTitle(s.themeMode), icon = Icons.Rounded.DarkMode, chevron = true, onClick = { themeDialog = true })
+                Divider()
+                ListRow("Акцентный цвет", value = app.tracc.core.AccentPalette.names[app.tracc.core.AccentPalette.index(s.accentColor)], icon = Icons.Rounded.Palette, chevron = true, onClick = { accentDialog = true })
+            }
+        }
+    }
+    if (themeDialog) ChoiceDialog("Тема", ThemeMode.entries.map { Choice(it, themeTitle(it)) }, s.themeMode, onDismiss = { themeDialog = false }) {
+        vm.updateSettings { settings -> settings.copy(themeMode = it) }
+        themeDialog = false
+    }
+    if (accentDialog) ChoiceDialog("Акцентный цвет", app.tracc.core.AccentPalette.names.mapIndexed { i, name -> Choice(i, name) }, s.accentColor, onDismiss = { accentDialog = false }) {
+        vm.updateSettings { settings -> settings.copy(accentColor = it) }
+        accentDialog = false
     }
 }
 

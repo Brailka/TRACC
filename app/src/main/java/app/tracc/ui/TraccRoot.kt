@@ -42,6 +42,9 @@ import app.tracc.ui.screens.AddDialog
 import app.tracc.ui.screens.AppsScreen
 import app.tracc.ui.screens.ConfirmLinkDialog
 import app.tracc.ui.screens.HomeScreen
+import app.tracc.ui.screens.ClassicHomeScreen
+import app.tracc.ui.screens.InterfaceScreen
+import app.tracc.data.InterfaceMode
 import app.tracc.ui.screens.LocationsScreen
 import app.tracc.ui.screens.MessagesScreen
 import app.tracc.ui.screens.RoutingDetailScreen
@@ -74,13 +77,14 @@ fun TraccRoot(vm: MainViewModel) {
                     label = "screen",
                 ) { screen ->
                     when (screen) {
-                        Screen.Home -> HomeScreen(vm)
+                        Screen.Home -> if (settings.interfaceMode == InterfaceMode.CLASSIC) ClassicHomeScreen(vm) else HomeScreen(vm)
                         Screen.Locations -> LocationsScreen(vm)
                         Screen.Subscriptions -> SubscriptionsScreen(vm)
                         Screen.Routing -> RoutingScreen(vm)
                         is Screen.RoutingDetail -> RoutingDetailScreen(vm, screen.id)
                         Screen.Apps -> AppsScreen(vm)
                         Screen.Settings -> SettingsScreen(vm)
+                        Screen.Interface -> InterfaceScreen(vm)
                         Screen.Messages -> MessagesScreen(vm)
                         Screen.About -> AboutScreen(vm)
                     }
