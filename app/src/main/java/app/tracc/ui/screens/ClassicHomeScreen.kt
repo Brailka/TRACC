@@ -71,6 +71,7 @@ fun ClassicHomeScreen(vm: MainViewModel) {
     val pings by vm.store.pings.collectAsStateWithLifecycle()
     val update by app.tracc.App.updates.available.collectAsStateWithLifecycle()
     val groups = remember(nodes, subs, settings, pings) { vm.groups(nodes, subs, settings, pings) }
+    val active = state is VpnState.Connected
     var expanded by remember(subs.firstOrNull()?.id) { mutableStateOf(subs.firstOrNull()?.id) }
     var now by remember { mutableStateOf(System.currentTimeMillis()) }
     LaunchedEffect(active) {
@@ -80,7 +81,6 @@ fun ClassicHomeScreen(vm: MainViewModel) {
         }
     }
     val current = (state as? VpnState.Connected)?.node ?: selected
-    val active = state is VpnState.Connected
 
     LazyColumn(
         Modifier.fillMaxSize().background(Brush.verticalGradient(if (c.dark) listOf(Color(0xFF1B1D57), Color(0xFF11143A)) else listOf(c.background, c.accent.copy(alpha = 0.18f)))),
