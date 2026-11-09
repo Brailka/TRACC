@@ -38,6 +38,8 @@ data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val accentColor: Int = 0,
     val interfaceMode: InterfaceMode = InterfaceMode.MODERN,
+    val modernScale: Float = 1f,
+    val classicScale: Float = 0.88f,
     val routingEnabled: Boolean = true,
     val activeRoutingId: String = "builtin-ru",
     val perAppMode: PerAppMode = PerAppMode.OFF,

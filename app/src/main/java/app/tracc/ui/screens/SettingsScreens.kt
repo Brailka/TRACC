@@ -459,6 +459,7 @@ fun InterfaceScreen(vm: MainViewModel) {
     val s by vm.store.settings.collectAsStateWithLifecycle()
     var themeDialog by remember { mutableStateOf(false) }
     var accentDialog by remember { mutableStateOf(false) }
+    var scaleDialog by remember { mutableStateOf<InterfaceMode?>(null) }
     ScreenScaffold("Интерфейс", onBack = { vm.back() }) {
         item { SectionTitle("Главный экран") }
         item {
@@ -470,12 +471,26 @@ fun InterfaceScreen(vm: MainViewModel) {
                 ListRow("Тема", value = themeTitle(s.themeMode), icon = Icons.Rounded.DarkMode, chevron = true, onClick = { themeDialog = true })
                 Divider()
                 ListRow("Акцентный цвет", value = app.tracc.core.AccentPalette.names[app.tracc.core.AccentPalette.index(s.accentColor)], icon = Icons.Rounded.Palette, chevron = true, onClick = { accentDialog = true })
+                Divider()
+                ListRow("Размер нового интерфейса", value = "${(s.modernScale * 100).toInt()}%", chevron = true, onClick = { scaleDialog = InterfaceMode.MODERN })
+                Divider()
+                ListRow("Размер старого интерфейса", value = "${(s.classicScale * 100).toInt()}%", chevron = true, onClick = { scaleDialog = InterfaceMode.CLASSIC })
             }
         }
     }
     if (themeDialog) ChoiceDialog("Тема", ThemeMode.entries.map { Choice(it, themeTitle(it)) }, s.themeMode, onDismiss = { themeDialog = false }) {
         vm.updateSettings { settings -> settings.copy(themeMode = it) }
         themeDialog = false
+    }
+    scaleDialog?.let { mode ->
+        var scale by remember(mode) { mutableStateOf(if (mode == InterfaceMode.CLASSIC) s.classicScale else s.modernScale) }
+        TraccDialog("Размер интерфейса", onDismiss = { scaleDialog = null }, confirm = DialogAction("Применить") {
+            vm.updateSettings { if (mode == InterfaceMode.CLASSIC) it.copy(classicScale = scale) else it.copy(modernScale = scale) }
+            scaleDialog = null
+        }) {
+            Text("${(scale * 100).toInt()}%", color = Tracc.colors.text)
+            androidx.compose.material3.Slider(value = scale, onValueChange = { scale = it }, valueRange = 0.7f..1.25f)
+        }
     }
     if (accentDialog) ChoiceDialog("Акцентный цвет", app.tracc.core.AccentPalette.names.mapIndexed { i, name -> Choice(i, name) }, s.accentColor, onDismiss = { accentDialog = false }) {
         vm.updateSettings { settings -> settings.copy(accentColor = it) }

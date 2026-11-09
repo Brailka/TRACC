@@ -77,7 +77,13 @@ fun TraccRoot(vm: MainViewModel) {
                     label = "screen",
                 ) { screen ->
                     when (screen) {
-                        Screen.Home -> if (settings.interfaceMode == InterfaceMode.CLASSIC) ClassicHomeScreen(vm) else HomeScreen(vm)
+                        Screen.Home -> {
+                            val density = androidx.compose.ui.platform.LocalDensity.current
+                            val scale = (if (settings.interfaceMode == InterfaceMode.CLASSIC) settings.classicScale else settings.modernScale).coerceIn(0.7f, 1.25f)
+                            CompositionLocalProvider(androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density * scale, density.fontScale)) {
+                                if (settings.interfaceMode == InterfaceMode.CLASSIC) ClassicHomeScreen(vm) else HomeScreen(vm)
+                            }
+                        }
                         Screen.Locations -> LocationsScreen(vm)
                         Screen.Subscriptions -> SubscriptionsScreen(vm)
                         Screen.Routing -> RoutingScreen(vm)

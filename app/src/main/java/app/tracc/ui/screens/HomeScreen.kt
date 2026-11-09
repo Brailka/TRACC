@@ -402,7 +402,7 @@ private fun WhitelistBadge(vm: MainViewModel) {
 
 /** Всё о подписке на главном экране: карточка провайдера, баннер и ошибка обновления. */
 @Composable
-private fun ProviderBlock(sub: Subscription, open: (String) -> Unit, onClick: () -> Unit) {
+internal fun ProviderBlock(sub: Subscription, open: (String) -> Unit, onClick: () -> Unit) {
     val c = Tracc.colors
     // Баннер из одной кнопки («Перейти в ЛК») живёт внутри карточки провайдера, а не отдельным блоком.
     val banner = bannerFor(sub)
