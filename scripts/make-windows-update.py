@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""update-windows.json для обновления RVC для Windows из приложения (desktop/.../data/Updates.kt).
+"""update-windows.json для обновления TRACC для Windows из приложения (desktop/.../data/Updates.kt).
 
 Использование:
     python scripts/make-windows-update.py <версия> <каталог dist> <owner/repo> <файл заметок>
 
-Ищет dist/RVC-windows-<версия>.msi, считает SHA-256 и размер, пишет dist/update-windows.json.
+Ищет dist/TRACC-windows-<версия>.msi, считает SHA-256 и размер, пишет dist/update-windows.json.
 Заметки — по строке на пункт (пустые строки и строки с # пропускаются). Файл кладётся в релиз
 windows-v<версия> вместе с MSI и EXE.
 """
@@ -26,7 +26,7 @@ def main() -> None:
     if len(sys.argv) != 5:
         sys.exit(__doc__)
     version, dist, repo, notes_file = sys.argv[1:]
-    msi_name = f'RVC-windows-{version}.msi'
+    msi_name = f'TRACC-windows-{version}.msi'
     msi = os.path.join(dist, msi_name)
     if not os.path.exists(msi):
         sys.exit(f'нет {msi}')

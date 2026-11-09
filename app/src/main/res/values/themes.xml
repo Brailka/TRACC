@@ -1,12 +1,12 @@
 <resources>
-    <style name="Theme.Rvc" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Tracc" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/bg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <style name="Theme.Rvc.Toggle" parent="android:Theme.Translucent.NoTitleBar">
+    <style name="Theme.Tracc.Toggle" parent="android:Theme.Translucent.NoTitleBar">
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 </resources>

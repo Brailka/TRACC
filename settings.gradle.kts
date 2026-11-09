@@ -12,11 +12,9 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "RVC"
+rootProject.name = "TRACC"
 include(":app")
 // Общая логика для Android и iOS: парсеры, сборка конфигурации Xray, заголовки провайдера, маршрутизация.
 include(":shared")
 // Генератор Baseline Profile: ./gradlew :app:generateReleaseBaselineProfile (нужен эмулятор или телефон).
 include(":baselineprofile")
-// Windows-версия: Compose Desktop, ядро rvc-core.exe (Go + Xray) и rvcnet.dll. См. desktop/README.md.
-include(":desktop")

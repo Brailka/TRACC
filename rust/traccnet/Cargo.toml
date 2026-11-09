@@ -1,0 +1,31 @@
+[package]
+name = "traccnet"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+description = "Сетевой слой TRACC: подписки, пинг, DoH, обрезка геофайлов"
+
+[lib]
+# cdylib — libtraccnet.so для Android, staticlib — libtraccnet.a для iOS.
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-webpki-roots", "socks", "gzip", "http2"] }
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "net", "time", "sync"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+socket2 = { version = "0.5", features = ["all"] }
+memmap2 = "0.9"
+url = "2"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = { version = "0.21", default-features = false }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false

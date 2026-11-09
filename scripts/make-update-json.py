@@ -2,7 +2,7 @@
 """Собирает update.json для обновления из приложения.
 
 Использование: make-update-json.py <версия> <каталог с APK> <repo owner/name> [заметки.txt]
-APK должны называться RVC-<версия>-<abi>.apk (abi: arm64-v8a, armeabi-v7a, x86_64, x86, universal).
+APK должны называться TRACC-<версия>-<abi>.apk (abi: arm64-v8a, armeabi-v7a, x86_64, x86, universal).
 """
 import hashlib
 import json
@@ -14,9 +14,9 @@ notes_file = sys.argv[4] if len(sys.argv) > 4 else None
 major, minor, patch = (int(p) for p in version.split('.')[:3])
 assets = {}
 for name in sorted(os.listdir(apk_dir)):
-    if not (name.startswith(f'RVC-{version}-') and name.endswith('.apk')):
+    if not (name.startswith(f'TRACC-{version}-') and name.endswith('.apk')):
         continue
-    abi = name[len(f'RVC-{version}-'):-4]
+    abi = name[len(f'TRACC-{version}-'):-4]
     path = os.path.join(apk_dir, name)
     digest = hashlib.sha256(open(path, 'rb').read()).hexdigest()
     assets[abi] = {
@@ -31,5 +31,5 @@ info = {'versionCode': major * 10000 + minor * 100 + patch, 'versionName': versi
 json.dump(info, open(os.path.join(apk_dir, 'update.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=2)
 with open(os.path.join(apk_dir, 'SHA256SUMS'), 'w', encoding='utf8') as f:
     for abi, a in assets.items():
-        f.write(f"{a['sha256']}  RVC-{version}-{abi}.apk\n")
+        f.write(f"{a['sha256']}  TRACC-{version}-{abi}.apk\n")
 print(json.dumps(info, ensure_ascii=False, indent=2))

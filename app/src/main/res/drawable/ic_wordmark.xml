@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Логотип RVC: строчные буквы из штрихов одной толщины со скруглёнными концами. -->
+<!-- Логотип TRACC: строчные буквы из штрихов одной толщины со скруглёнными концами. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="54dp" android:height="28dp"
-    android:viewportWidth="54" android:viewportHeight="28">
-    <!-- Штрихи занимают x 1,25…51,04 и y 8…26: сдвиг (+0,86; −3) ставит надпись ровно по центру поля 54×28. -->
-    <group android:translateX="0.86" android:translateY="-3">
-    <path android:pathData="M4,10.75 L4,23.25 M4,17 C4,12.5 7,10.75 11,10.75 M18.5,10.75 L25,23.25 L31.5,10.75 M48.29,12.98 A6.25,6.25 0 1,0 48.29,21.02"
-        android:strokeColor="#FFFFFFFF" android:strokeWidth="5.5"
+    android:width="72dp" android:height="28dp"
+    android:viewportWidth="72" android:viewportHeight="28">
+    <group android:translateX="1" android:translateY="-1.5">
+    <path android:pathData="M5,8 L5,23 M1,12 L10,12 M15,11 L15,23 M15,17 C15,13 18,11 21,11 M33,11 A6,6 0,1 0,33 23 A6,6 0,0 0,39 17 M39,11 L39,23 M53,13 A6,6 0,1 0,53 21 M67,13 A6,6 0,1 0,67 21"
+        android:strokeColor="#FFFFFFFF" android:strokeWidth="5"
         android:strokeLineCap="round" android:strokeLineJoin="round" />
     </group>
 </vector>

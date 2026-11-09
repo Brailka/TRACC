@@ -8,9 +8,9 @@
         android:shortcutShortLabel="@string/shortcut_connect"
         android:shortcutLongLabel="@string/shortcut_connect">
         <intent
-            android:action="app.rvc.action.CONNECT"
-            android:targetPackage="com.makdren.rvc"
-            android:targetClass="app.rvc.vpn.ToggleActivity" />
+            android:action="app.tracc.action.CONNECT"
+            android:targetPackage="app.tracc"
+            android:targetClass="app.tracc.vpn.ToggleActivity" />
     </shortcut>
     <shortcut
         android:shortcutId="disconnect"
@@ -19,8 +19,8 @@
         android:shortcutShortLabel="@string/shortcut_disconnect"
         android:shortcutLongLabel="@string/shortcut_disconnect">
         <intent
-            android:action="app.rvc.action.DISCONNECT"
-            android:targetPackage="com.makdren.rvc"
-            android:targetClass="app.rvc.vpn.ToggleActivity" />
+            android:action="app.tracc.action.DISCONNECT"
+            android:targetPackage="app.tracc"
+            android:targetClass="app.tracc.vpn.ToggleActivity" />
     </shortcut>
 </shortcuts>

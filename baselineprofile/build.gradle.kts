@@ -15,7 +15,7 @@ plugins {
 }
 
 android {
-    namespace = "app.rvc.baselineprofile"
+    namespace = "app.tracc.baselineprofile"
     compileSdk = 36
     defaultConfig {
         minSdk = 28

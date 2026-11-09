@@ -1,9 +1,9 @@
-# RVC
+# TRACC
 
 Клиент для Android и Windows для VPN-сервисов на панели [Remnawave](https://docs.rw) и совместимых подписок Happ/INCY.
 Минималистичный интерфейс в стиле liquid glass, одна большая кнопка, информация о подписке и объявления провайдера прямо на главном экране.
 
-Лицензия — GPL-3.0. Чат: https://t.me/rvcapp
+Лицензия — GPL-3.0. Чат: https://t.me/traccapp
 
 ## Протоколы
 
@@ -15,11 +15,11 @@ Hysteria2 (obfs salamander, port hopping), SOCKS5, HTTP/HTTPS-прокси, Wire
 | :-- | :-- |
 | Xray-core (AndroidLibXrayLite) | 26.10.21 |
 | amneziawg-go (из amneziawg-android) | 3.1.20260814 |
-| Сетевой модуль на Rust (`rust/rvcnet`) | reqwest + rustls, tokio, memmap2 |
+| Сетевой модуль на Rust (`rust/traccnet`) | reqwest + rustls, tokio, memmap2 |
 
 ## Совместимость с Remnawave, Happ и INCY
 
-- **HWID всегда отправляется**: `x-hwid`, `x-device-os`, `x-ver-os`, `x-device-model`, `User-Agent: RVC/<версия>` (в Remnawave добавьте Response Rule `user-agent CONTAINS RVC → XRAY_JSON`, чтобы работали автовыбор и балансировщики). Работает лимит устройств Remnawave; ответы `x-hwid-max-devices-reached` / `x-hwid-not-supported` показываются пользователю.
+- **HWID всегда отправляется**: `x-hwid`, `x-device-os`, `x-ver-os`, `x-device-model`, `User-Agent: TRACC/<версия>` (в Remnawave добавьте Response Rule `user-agent CONTAINS TRACC → XRAY_JSON`, чтобы работали автовыбор и балансировщики). Работает лимит устройств Remnawave; ответы `x-hwid-max-devices-reached` / `x-hwid-not-supported` показываются пользователю.
 - Форматы подписки: base64, plain text, JSON-массив конфигураций Xray, `.conf` WireGuard/AmneziaWG, `amneziawg://`/`awg://`, JSON-контейнер AmneziaWG от INCY.
 - Заголовки и строки `#key: value` в теле: `profile-title` (в т.ч. `base64:` с описанием), `profile-description`, `subscription-userinfo` (включая `0` — скрыть), `profile-update-interval`, `support-url`, `support-email`, `profile-web-page-url`/`homepage`, `announce`, `announce-url`, `premium-url`, `banner-*`, `expiry-banner-*`, `sub-info-*`, `sub-expire`, `notification-subs-expire`, `hide-url`, `hide-check`, `new-url`, `new-domain`, `fallback-url`, `routing`, `autorouting`, `routing-enable`, `sort-order`/`subscriptions-sort-type`, `per-app-proxy-*`, `fragmentation-*`, `noises-*`, `server-address-resolve-*`, `subscription-autoconnect(-type)`, `subscription-ping-onopen-enabled`, `subscription-auto-update-(open-)enable`, `ping-type`, `check-url-via-proxy`, `mux-*`, `sniffing-enable`, `exclude-routes(-set)`, `xray-tun-mtu`, `hide-vpn-icon`, `providerid`, `subscription-request-timeout`, `dont-use-filter`, метки серверов `only Wi-Fi` / `only Mobile`, описание сервера `#Имя?serverDescription=base64`.
 - Логотип провайдера: заголовок `profile-logo-url` (https, PNG/JPEG/WebP).
@@ -33,7 +33,7 @@ Hysteria2 (obfs salamander, port hopping), SOCKS5, HTTP/HTTPS-прокси, Wire
 
 ### Deep links
 
-Схемы `rvc://`, `happ://`, `incy://`, `v2raytun://`, `sub://` и прямые `vless://`, `vmess://`, `trojan://`, `ss://`, `hy2://`, `hysteria2://`, `socks://`, `wireguard://`, `awg://`:
+Схемы `tracc://`, `happ://`, `incy://`, `v2raytun://`, `sub://` и прямые `vless://`, `vmess://`, `trojan://`, `ss://`, `hy2://`, `hysteria2://`, `socks://`, `wireguard://`, `awg://`:
 `add/{url}`, `import/{данные}`, `routing/…`, `autorouting/…`, `connect`/`open`, `disconnect`/`close`, `toggle`, `status`, `incy://crypt1/…`.
 
 ## Безопасность и необнаружимость
@@ -51,23 +51,27 @@ Hysteria2 (obfs salamander, port hopping), SOCKS5, HTTP/HTTPS-прокси, Wire
 
 ```sh
 ./scripts/fetch-natives.sh      # libv2ray.aar, libwg-go.so
-./scripts/build-rust.sh         # librvcnet.so для 4 ABI
-./gradlew :app:testDebugUnitTest :app:assembleRelease -PrvcVersion=1.0.0
+./scripts/build-rust.sh         # libtraccnet.so для 4 ABI
+./gradlew :app:testDebugUnitTest :app:assembleRelease \
+  -PtraccVersion=1.0.0 -PtraccUpdateRepo=OWNER/TRACC
 ```
 
-Подпись релиза — `keystore.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) или переменные `RVC_KEYSTORE*`.
+Подпись релиза — `keystore.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) или переменные `TRACC_KEYSTORE*`.
+Плашка обновления читает `update.json` из GitHub Releases репозитория, переданного через
+`-PtraccUpdateRepo=owner/repository`. Workflow `.github/workflows/release.yml` собирает и публикует
+APK, контрольные суммы, `update.json` и архив исходников при отправке тега `vX.Y.Z`.
 
 ### Windows
 
-Модуль `desktop/` — Compose Multiplatform поверх `shared`; ядро `rvc-core.exe` (Go + Xray-core), сеть — `rvcnet.dll` через JNA.
+Модуль `desktop/` — Compose Multiplatform поверх `shared`; ядро `tracc-core.exe` (Go + Xray-core), сеть — `traccnet.dll` через JNA.
 Нужны JDK 21, Go 1.27 и Rust с целью `x86_64-pc-windows-gnu`. Подробности — `desktop/README.md`, UX и замеры — `desktop/UX-AUDIT.md`.
 
 ```sh
-desktop/scripts/build-natives.sh                               # rvc-core.exe, rvcnet.dll, wintun.dll, геобазы
-./gradlew :desktop:test :desktop:packageMsi :desktop:packageExe -PrvcDesktopVersion=1.0.0
-python scripts/make-windows-update.py 1.0.0 dist makdren/RVC notes-windows.txt   # update-windows.json для релиза windows-v1.0.0
+desktop/scripts/build-natives.sh                               # tracc-core.exe, traccnet.dll, wintun.dll, геобазы
+./gradlew :desktop:test :desktop:packageMsi :desktop:packageExe -PtraccDesktopVersion=1.0.0
+python scripts/make-windows-update.py 1.0.0 dist OWNER/TRACC notes-windows.txt   # update-windows.json для релиза windows-v1.0.0
 ```
 
 ## Лицензии
 
-RVC — GPL-3.0. Сторонние компоненты: Фарватер (GPL-3.0), Xray-core и AndroidLibXrayLite (MPL-2.0), amneziawg-go / amneziawg-android (MIT / Apache-2.0), Compose Multiplatform и JNA (Apache-2.0), Wintun (распространение неизменённой DLL по лицензии WireGuard LLC, `LICENSE-Wintun.txt`), reqwest, rustls, tokio, memmap2, serde (MIT / Apache-2.0), шрифт Inter (OFL-1.1), ключ ссылок crypt1 из `@incy/link-encoder` (MIT, © INCY LLC).
+TRACC — GPL-3.0. Сторонние компоненты: Фарватер (GPL-3.0), Xray-core и AndroidLibXrayLite (MPL-2.0), amneziawg-go / amneziawg-android (MIT / Apache-2.0), Compose Multiplatform и JNA (Apache-2.0), Wintun (распространение неизменённой DLL по лицензии WireGuard LLC, `LICENSE-Wintun.txt`), reqwest, rustls, tokio, memmap2, serde (MIT / Apache-2.0), шрифт Inter (OFL-1.1), ключ ссылок crypt1 из `@incy/link-encoder` (MIT, © INCY LLC).

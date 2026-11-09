@@ -16,28 +16,28 @@ val signingProps = Properties().apply {
 }
 
 android {
-    namespace = "app.rvc"
+    namespace = "app.tracc"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.makdren.rvc"
+        applicationId = "app.tracc"
         minSdk = 26
         targetSdk = 35
-        val tagVersion = (findProperty("rvcVersion") as String?)?.removePrefix("v")
+        val tagVersion = (findProperty("traccVersion") as String?)?.removePrefix("v")
         versionName = tagVersion ?: "1.0.0"
         versionCode = tagVersion?.split('.', '-')?.let { p -> p[0].toInt() * 10000 + p[1].toInt() * 100 + p[2].toInt() } ?: 10000
-        buildConfigField("String", "UPDATE_REPO", "\"${findProperty("rvcUpdateRepo") ?: "makdren/RVC"}\"")
+        buildConfigField("String", "UPDATE_REPO", "\"${findProperty("traccUpdateRepo") ?: "OWNER/TRACC"}\"")
     }
 
     signingConfigs {
         create("release") {
-            val keystore = env("RVC_KEYSTORE") ?: signingProps.getProperty("storeFile")
+            val keystore = env("TRACC_KEYSTORE") ?: signingProps.getProperty("storeFile")
             if (keystore != null) {
                 storeFile = file(keystore)
-                val password = env("RVC_KEYSTORE_PASSWORD") ?: signingProps.getProperty("storePassword")
+                val password = env("TRACC_KEYSTORE_PASSWORD") ?: signingProps.getProperty("storePassword")
                 storePassword = password
-                keyAlias = env("RVC_KEY_ALIAS") ?: signingProps.getProperty("keyAlias") ?: "rvc"
-                keyPassword = env("RVC_KEY_PASSWORD") ?: signingProps.getProperty("keyPassword") ?: password
+                keyAlias = env("TRACC_KEY_ALIAS") ?: signingProps.getProperty("keyAlias") ?: "tracc"
+                keyPassword = env("TRACC_KEY_PASSWORD") ?: signingProps.getProperty("keyPassword") ?: password
             }
             enableV1Signing = true
             enableV2Signing = true

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RVC</string>
+    <string name="app_name">TRACC</string>
     <string name="widget_description">Включение и выключение VPN одним нажатием</string>
     <string name="shortcut_connect">Подключить</string>
     <string name="shortcut_disconnect">Отключить</string>
