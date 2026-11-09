@@ -62,6 +62,36 @@ data class ProxyNode(
     val subtitle: String
         get() = description?.takeIf { it.isNotBlank() } ?: tags.joinToString(" · ")
 
+    /** Короткая техническая подпись для списка серверов: VLESS / XHTTP / REALITY / JSON. */
+    val connectionLabel: String
+        get() = buildList {
+            add(protocol.title.uppercase())
+            add(
+                when (protocol) {
+                    Protocol.VLESS, Protocol.VMESS, Protocol.TROJAN -> transportLabel
+                    Protocol.HYSTERIA2, Protocol.WIREGUARD, Protocol.AMNEZIAWG -> "UDP"
+                    Protocol.SHADOWSOCKS, Protocol.SOCKS, Protocol.HTTP -> "TCP"
+                },
+            )
+            when (security) {
+                "reality" -> add("REALITY")
+                "tls" -> add("TLS")
+            }
+            if (params["flow"].orEmpty().contains("vision", ignoreCase = true)) add("VISION")
+            if (isJson) add("JSON")
+        }.distinct().joinToString(" / ")
+
+    private val transportLabel: String
+        get() = when (transport) {
+            "tcp", "raw" -> "TCP"
+            "xhttp", "splithttp" -> "XHTTP"
+            "ws", "websocket" -> "WS"
+            "grpc" -> "GRPC"
+            "httpupgrade" -> "HTTP UPGRADE"
+            "kcp", "mkcp" -> "KCP"
+            else -> transport.uppercase()
+        }
+
     val tags: List<String>
         get() = buildList {
             add(protocol.title)

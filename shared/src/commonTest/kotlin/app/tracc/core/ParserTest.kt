@@ -41,15 +41,18 @@ class ParserTest {
         assertEquals("🇱🇹 Test", n.name)
         assertEquals("Happ the best", n.description)
         assertTrue("Vision" in n.tags)
+        assertEquals("VLESS / TCP / REALITY / VISION", n.connectionLabel)
     }
 
     @Test
     fun xhttpAndHysteriaPorts() {
         val x = LinkParser.parse("vless://id@h.example:443?type=splithttp&security=tls&path=%2Fx&mode=auto#X")!!
         assertEquals("xhttp", x.transport)
+        assertEquals("VLESS / XHTTP / TLS", x.connectionLabel)
         val h = LinkParser.parse("hysteria2://pass@srv.example:443,5000-6000?sni=srv.example&obfs=salamander&obfs-password=ob#H")!!
         assertEquals(443, h.port)
         assertEquals("443,5000-6000", h.params["mport"])
+        assertEquals("HYSTERIA2 / UDP", h.connectionLabel)
     }
 
     @Test

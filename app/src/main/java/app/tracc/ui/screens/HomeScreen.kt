@@ -767,10 +767,13 @@ fun NodeRow(node: ProxyNode, ping: Long?, selected: Boolean, stale: Boolean = fa
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f).padding(end = 12.dp)) {
             Text(node.cleanName, style = TraccType.bodyMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            // Подпись — только если она что-то говорит: описание от провайдера или протокол своего сервера.
-            // «VLESS» под каждой строкой подписки — шум, который удлиняет список.
-            val hint = node.description?.takeIf { it.isNotBlank() } ?: node.subtitle.takeIf { node.sourceId == ProxyNode.MANUAL_SOURCE }
-            if (hint != null) Text(hint, style = TraccType.caption, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                node.connectionLabel,
+                style = TraccType.caption,
+                color = c.textSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
         PingBadge(ping, stale = stale, checking = checking)
         Box(Modifier.padding(start = 10.dp).size(22.dp), contentAlignment = Alignment.Center) {

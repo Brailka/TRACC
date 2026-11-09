@@ -53,7 +53,7 @@ Hysteria2 (obfs salamander, port hopping), SOCKS5, HTTP/HTTPS-прокси, Wire
 ./scripts/fetch-natives.sh      # libv2ray.aar, libwg-go.so
 ./scripts/build-rust.sh         # libtraccnet.so для 4 ABI
 ./gradlew :app:testDebugUnitTest :app:assembleRelease \
-  -PtraccVersion=1.0.0 -PtraccUpdateRepo=makdren/TRACC
+  -PtraccVersion=1.0.0 -PtraccUpdateRepo=Brailka/TRACC
 ```
 
 Подпись релиза — `keystore.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) или переменные `TRACC_KEYSTORE*`.
