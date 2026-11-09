@@ -42,6 +42,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.rounded.MoreHoriz
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tracc.ui.MainViewModel
 import app.tracc.ui.Screen
@@ -90,11 +97,9 @@ fun ClassicHomeScreen(vm: MainViewModel) {
 
     Box(Modifier.fillMaxSize().background(if (c.dark) Color(0xFF11142F) else c.background)) {
     Canvas(Modifier.fillMaxSize()) {
-        repeat(7) { i ->
-            val radius = size.width * (0.7f + i * 0.28f)
-            val origin = Offset(size.width * 1.2f, -size.height * 0.1f)
-            drawCircle(c.accent.copy(alpha = 0.025f + i * 0.004f), radius, origin, style = Stroke(size.width * 0.19f))
-            drawCircle(Color.White.copy(alpha = if (c.dark) 0.025f else 0.18f), radius, origin, style = Stroke(1.dp.toPx()))
+        repeat(2) { i ->
+            val radius = size.height * (0.65f + i * 0.42f)
+            drawCircle(c.accent.copy(alpha = 0.025f), radius, Offset(size.width * 1.3f, -size.height * 0.1f), style = Stroke(size.width * 0.65f))
         }
     }
     LazyColumn(
@@ -153,33 +158,68 @@ fun ClassicHomeScreen(vm: MainViewModel) {
 private fun ClassicSubscription(sub: Subscription?, nodes: List<ProxyNode>, pings: Map<String, app.tracc.data.PingResult>, pending: Set<String>, selected: ProxyNode?, expanded: Boolean, onToggle: () -> Unit, onRefresh: () -> Unit, onPing: () -> Unit, onSelect: (ProxyNode) -> Unit) {
     val c = Tracc.colors
     val context = LocalContext.current
-    Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp).clip(RoundedCornerShape(22.dp)).background(c.bar.copy(alpha = 0.83f))) {
-        Row(Modifier.fillMaxWidth().pressable(onClick = onToggle).padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
+    var menu by remember { mutableStateOf(false) }
+    var info by remember { mutableStateOf(false) }
+    val panel = if (c.dark) Color(0xFF29294F) else c.bar
+    val small = TraccType.caption.copy(fontSize = 10.sp, lineHeight = 12.sp)
+    val links = listOfNotNull(
+        sub?.meta?.webPageUrl?.let { "Личный кабинет" to it },
+        sub?.meta?.premiumUrl?.let { "Продлить подписку" to it },
+        sub?.meta?.supportUrl?.let { "Поддержка" to it },
+        sub?.meta?.supportEmail?.let { "Email" to "mailto:$it" },
+    )
+    val usage = sub?.meta?.usage?.takeUnless { sub.meta.hideUsage }
+    val announcement = sub?.meta?.announce ?: sub?.meta?.description
+    if (info) app.tracc.ui.components.TraccDialog(sub?.title ?: "Подписка", onDismiss = { info = false }, text = listOfNotNull(
+        sub?.meta?.description, announcement,
+        usage?.let { "Использовано ${app.tracc.ui.formatBytes(it.used)} / ${if (it.unlimited) "∞" else app.tracc.ui.formatBytes(it.total)}" },
+        usage?.takeIf { !it.unlimited }?.let { "Осталось ${app.tracc.ui.formatBytes((it.total - it.used).coerceAtLeast(0))}" },
+        usage?.takeIf { it.expire > 0 }?.let { app.tracc.ui.formatExpire(it.expire) }, sub?.error,
+    ).distinct().joinToString("\n\n"))
+    Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp).clip(RoundedCornerShape(18.dp)).background(panel)) {
+        Row(Modifier.fillMaxWidth().pressable(onClick = onToggle).padding(horizontal = 10.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(if (expanded) Icons.Rounded.KeyboardArrowDown else Icons.Rounded.KeyboardArrowRight, null, tint = c.textSecondary)
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                Text(sub?.title ?: "Мои серверы", style = TraccType.title, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${nodes.size} серверов", style = TraccType.caption, color = c.textSecondary)
+                Text(sub?.title ?: "Мои серверы", style = TraccType.body.copy(fontSize = 17.sp), color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(sub?.let { "${if (it.updatedAt > 0) java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date(it.updatedAt)) else "Не обновлено"} | ${it.effectiveIntervalHours} ч." } ?: "${nodes.size} серверов", style = small.copy(fontSize = 8.sp), color = c.textTertiary, maxLines = 1)
             }
             if (sub != null) Icon(Icons.Rounded.Refresh, "Обновить подписку", tint = c.textSecondary, modifier = Modifier.padding(8.dp).size(23.dp).pressable(onClick = onRefresh))
             Icon(Icons.Rounded.Speed, "Проверить пинг", tint = c.textSecondary, modifier = Modifier.padding(8.dp).size(23.dp).pressable(onClick = onPing))
-        }
-        if (sub != null) {
-            ProviderBlock(sub, open = { app.tracc.ui.Links.open(context, it) }, onClick = onToggle)
-            sub.meta.usage?.takeIf { !sub.meta.hideUsage && !it.unlimited }?.let { usage ->
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    app.tracc.ui.components.UsageBar((usage.used.toFloat() / usage.total.coerceAtLeast(1)).coerceIn(0f, 1f))
-                    Text("Осталось ${app.tracc.ui.formatBytes((usage.total - usage.used).coerceAtLeast(0))}", style = TraccType.caption, color = c.textSecondary)
+            Box {
+                Icon(Icons.Rounded.MoreHoriz, "Действия подписки", tint = c.textSecondary, modifier = Modifier.padding(6.dp).size(22.dp).pressable(onClick = { menu = true }))
+                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                    DropdownMenuItem(text = { Text("Информация") }, onClick = { menu = false; info = true })
+                    links.forEach { (label, url) -> DropdownMenuItem(text = { Text(label) }, onClick = { menu = false; app.tracc.ui.Links.open(context, url) }) }
                 }
             }
+        }
+        if (usage != null || links.isNotEmpty()) {
+            Row(Modifier.fillMaxWidth().background(c.accent.copy(alpha = 0.07f)).padding(horizontal = 12.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(Icons.Rounded.Info, "Информация о подписке", tint = c.accent, modifier = Modifier.size(17.dp).pressable(onClick = { info = true }))
+                if (usage != null) {
+                    Box(Modifier.weight(1f).height(15.dp).clip(RoundedCornerShape(3.dp)).background(Color.Black.copy(alpha = 0.2f)).border(1.dp, c.textTertiary, RoundedCornerShape(3.dp)), contentAlignment = Alignment.Center) {
+                        Box(Modifier.fillMaxWidth(usage.fraction).height(15.dp).align(Alignment.CenterStart).background(c.accent.copy(alpha = 0.4f)))
+                        Text("${app.tracc.ui.formatBytes(usage.used)} / ${if (usage.unlimited) "∞" else app.tracc.ui.formatBytes(usage.total)}", style = small, color = c.text, maxLines = 1)
+                    }
+                    if (usage.expire > 0) Text("Истекает: ${java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault()).format(java.util.Date(usage.expire * 1000))}", style = small, color = c.text)
+                } else Spacer(Modifier.weight(1f))
+                links.firstOrNull { it.first == "Поддержка" }?.let { (_, url) -> Icon(Icons.Rounded.Send, "Поддержка", tint = c.accent, modifier = Modifier.size(16.dp).pressable(onClick = { app.tracc.ui.Links.open(context, url) })) }
+            }
+        }
+        val banner = sub?.meta?.banner ?: sub?.meta?.infoBanner
+        val description = announcement ?: banner?.text
+        description?.takeIf { it.isNotBlank() }?.let { text ->
+            Text(text, style = small, color = c.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().background(c.accent.copy(alpha = 0.07f)).pressable(onClick = { (sub?.meta?.announceUrl ?: banner?.buttonUrl)?.let { app.tracc.ui.Links.open(context, it) } ?: run { info = true } }).padding(horizontal = 12.dp, vertical = 5.dp))
         }
         AnimatedVisibility(expanded) {
             Column {
                 nodes.forEach { node ->
                     Row(Modifier.fillMaxWidth().background(if (node.id == selected?.id) c.accent.copy(alpha = 0.16f) else Color.Transparent).pressable(onClick = { onSelect(node) }).padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        FlagBubble(node.flag, node.cleanName)
+                        FlagBubble(node.flag, node.cleanName, size = 26.dp)
                         Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                            Text(node.cleanName, style = TraccType.bodyMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(node.connectionLabel, style = TraccType.caption, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(node.cleanName, style = TraccType.bodyMedium.copy(fontSize = 15.sp, lineHeight = 17.sp), color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(node.connectionLabel, style = small, color = c.textTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                         PingBadge(pings[node.id]?.ms, stale = pings[node.id]?.isStale == true, checking = node.id in pending)
                         Icon(Icons.Rounded.KeyboardArrowRight, null, tint = c.textSecondary, modifier = Modifier.size(20.dp))
