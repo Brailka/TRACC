@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version (for example 1.1.1)
+        required: true
 
 permissions:
   contents: write
@@ -14,6 +19,14 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+
+      - name: Resolve release version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
+        run: |
+          VERSION="${REQUESTED_VERSION#v}"
+          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=v$VERSION" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v4
         with:
@@ -28,7 +41,7 @@ jobs:
       - name: Install native build tools
         run: |
           cargo install cargo-ndk --locked
-          sdkmanager 'ndk;27.2.12479018'
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;27.2.12479018'
 
       - name: Fetch native dependencies
         env:
@@ -52,21 +65,20 @@ jobs:
           TRACC_KEY_ALIAS: ${{ secrets.TRACC_KEY_ALIAS }}
           TRACC_KEY_PASSWORD: ${{ secrets.TRACC_KEY_PASSWORD }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           ./gradlew :shared:allTests :app:testDebugUnitTest :app:assembleRelease \
-            -PtraccVersion="$VERSION" -PtraccUpdateRepo="$GITHUB_REPOSITORY"
+            -PtraccVersion="$RELEASE_VERSION" -PtraccUpdateRepo="$GITHUB_REPOSITORY"
 
       - name: Prepare release files
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           mkdir -p dist
           for ABI in arm64-v8a armeabi-v7a x86_64 x86 universal; do
-            cp "app/build/outputs/apk/release/app-${ABI}-release.apk" "dist/TRACC-${VERSION}-${ABI}.apk"
+            cp "app/build/outputs/apk/release/app-${ABI}-release.apk" "dist/TRACC-${RELEASE_VERSION}-${ABI}.apk"
           done
-          python3 scripts/make-update-json.py "$VERSION" dist "$GITHUB_REPOSITORY"
-          git archive --format=zip --prefix="TRACC-${VERSION}/" -o "dist/TRACC-${VERSION}-source.zip" HEAD
+          python3 scripts/make-update-json.py "$RELEASE_VERSION" dist "$GITHUB_REPOSITORY"
+          git archive --format=zip --prefix="TRACC-${RELEASE_VERSION}/" -o "dist/TRACC-${RELEASE_VERSION}-source.zip" HEAD
 
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
           files: dist/*
           generate_release_notes: true
