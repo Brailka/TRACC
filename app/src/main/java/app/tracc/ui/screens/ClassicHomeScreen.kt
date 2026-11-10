@@ -135,16 +135,16 @@ fun ClassicHomeScreen(vm: MainViewModel) {
                 Text("Скрыть все", style = TraccType.body, color = c.textSecondary, modifier = Modifier.pressable(onClick = { expanded = null }))
             }
         }
-        subs.forEach { sub ->
+        subs.sortedByDescending { it.pinned }.forEach { sub ->
             item(sub.id) {
-                ClassicSubscription(sub, groups.firstOrNull { it.id == sub.id }?.nodes.orEmpty(), pings, vm.pingPendingIds, current, expanded == sub.id,
+                ClassicSubscription(vm, sub, groups.firstOrNull { it.id == sub.id }?.nodes.orEmpty(), pings, vm.pingPendingIds, current, expanded == sub.id,
                     onToggle = { expanded = if (expanded == sub.id) null else sub.id },
                     onRefresh = { vm.update(sub.id) }, onPing = { vm.pingAll(groups.firstOrNull { it.id == sub.id }?.nodes.orEmpty()) }, onSelect = vm::select)
             }
         }
         groups.firstOrNull { it.id == ProxyNode.MANUAL_SOURCE }?.takeIf { it.nodes.isNotEmpty() }?.let { group ->
             item("manual") {
-                ClassicSubscription(null, group.nodes, pings, vm.pingPendingIds, current, expanded == "manual", { expanded = if (expanded == "manual") null else "manual" }, {}, { vm.pingAll(group.nodes) }, vm::select)
+                ClassicSubscription(vm, null, group.nodes, pings, vm.pingPendingIds, current, expanded == "manual", { expanded = if (expanded == "manual") null else "manual" }, {}, { vm.pingAll(group.nodes) }, vm::select)
             }
         }
         if (subs.isEmpty() && groups.all { it.nodes.isEmpty() }) item {
@@ -155,11 +155,12 @@ fun ClassicHomeScreen(vm: MainViewModel) {
 }
 
 @Composable
-private fun ClassicSubscription(sub: Subscription?, nodes: List<ProxyNode>, pings: Map<String, app.tracc.data.PingResult>, pending: Set<String>, selected: ProxyNode?, expanded: Boolean, onToggle: () -> Unit, onRefresh: () -> Unit, onPing: () -> Unit, onSelect: (ProxyNode) -> Unit) {
+private fun ClassicSubscription(vm: MainViewModel, sub: Subscription?, nodes: List<ProxyNode>, pings: Map<String, app.tracc.data.PingResult>, pending: Set<String>, selected: ProxyNode?, expanded: Boolean, onToggle: () -> Unit, onRefresh: () -> Unit, onPing: () -> Unit, onSelect: (ProxyNode) -> Unit) {
     val c = Tracc.colors
     val context = LocalContext.current
     var menu by remember { mutableStateOf(false) }
     var info by remember { mutableStateOf(false) }
+    if (menu && sub != null) SubscriptionActions(vm, sub, onRefresh, onPing) { menu = false }
     val panel = if (c.dark) Color(0xFF29294F) else c.bar
     val small = TraccType.caption.copy(fontSize = 10.sp, lineHeight = 12.sp)
     val links = listOfNotNull(
@@ -176,7 +177,7 @@ private fun ClassicSubscription(sub: Subscription?, nodes: List<ProxyNode>, ping
         usage?.takeIf { !it.unlimited }?.let { "Осталось ${app.tracc.ui.formatBytes((it.total - it.used).coerceAtLeast(0))}" },
         usage?.takeIf { it.expire > 0 }?.let { app.tracc.ui.formatExpire(it.expire) }, sub?.error,
     ).distinct().joinToString("\n\n"))
-    Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp).clip(RoundedCornerShape(18.dp)).background(panel)) {
+    app.tracc.ui.components.GlassPanel(Modifier.fillMaxWidth().padding(horizontal = 12.dp), shape = RoundedCornerShape(22.dp), tint = panel.copy(alpha = 0.62f), padding = 0.dp) {
         Row(Modifier.fillMaxWidth().pressable(onClick = onToggle).padding(horizontal = 10.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(if (expanded) Icons.Rounded.KeyboardArrowDown else Icons.Rounded.KeyboardArrowRight, null, tint = c.textSecondary)
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
@@ -187,7 +188,7 @@ private fun ClassicSubscription(sub: Subscription?, nodes: List<ProxyNode>, ping
             Icon(Icons.Rounded.Speed, "Проверить пинг", tint = c.textSecondary, modifier = Modifier.padding(8.dp).size(23.dp).pressable(onClick = onPing))
             Box {
                 Icon(Icons.Rounded.MoreHoriz, "Действия подписки", tint = c.textSecondary, modifier = Modifier.padding(6.dp).size(22.dp).pressable(onClick = { menu = true }))
-                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                if (sub == null) DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     DropdownMenuItem(text = { Text("Информация") }, onClick = { menu = false; info = true })
                     links.forEach { (label, url) -> DropdownMenuItem(text = { Text(label) }, onClick = { menu = false; app.tracc.ui.Links.open(context, url) }) }
                 }

@@ -216,7 +216,7 @@ fun Modifier.liquidGlass(
 }
 
 fun glassTint(dark: Boolean): Color =
-    if (dark) Color(0xFF1C1C1E).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.66f)
+    if (dark) Color(0xFF1C1C1E).copy(alpha = 0.44f) else Color.White.copy(alpha = 0.62f)
 
 fun glassControlFill(dark: Boolean): Color =
     if (dark) Color.White.copy(alpha = 0.13f) else Color.White.copy(alpha = 0.92f)

@@ -95,6 +95,7 @@ data class Subscription(
     val notices: List<String> = emptyList(),
     val nodeCount: Int = 0,
     val collapsed: Boolean = false,
+    val pinned: Boolean = false,
     val intervalHours: Int? = null,
     val lastExpireNotice: Long = 0,
     val importedVia: String? = null,

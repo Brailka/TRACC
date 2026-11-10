@@ -118,7 +118,7 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 /** Группа строк на одной стеклянной подложке, как секции в настройках iOS. */
 @Composable
 fun GroupCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    GlassPanel(modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), style = GlassStyles.Toast, padding = 0.dp, content = content)
+    GlassPanel(modifier.fillMaxWidth(), shape = RoundedCornerShape(26.dp), style = GlassStyles.Toast, padding = 0.dp, content = content)
 }
 
 @Composable

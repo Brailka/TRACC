@@ -78,6 +78,11 @@ fun PowerButton(state: PowerState, onClick: () -> Unit, modifier: Modifier = Mod
                 .pressable(scale = 0.90f, haptic = true, onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
+            Canvas(Modifier.fillMaxSize()) {
+                val radius = size.minDimension / 2
+                drawCircle(Brush.linearGradient(listOf(Color.White.copy(alpha = 0.18f), Color.Transparent, Color.Black.copy(alpha = 0.14f))), radius)
+                drawCircle(Brush.linearGradient(listOf(Color.White.copy(alpha = 0.5f), Color.Transparent, Color.White.copy(alpha = 0.08f))), radius - 1.dp.toPx(), style = Stroke(1.dp.toPx()))
+            }
             if (state == PowerState.CONNECTING && !still) {
                 ConnectingArc(ring)
             } else {
